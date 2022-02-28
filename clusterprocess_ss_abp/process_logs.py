@@ -77,14 +77,18 @@ def process_logs(basename,eof,runslist,
 
         if runstarts != None:
             basename = tmpname.replace('HERE',runstarts[run_index])
-        print(basename)
-        fname = basename + f"{run}"+ eof
 
+        fname = basename + f"{run}"+ eof
+        print(fname)
         try:
             ll = LogLoader(fname)
         except FileNotFoundError:
             missed_runs.append(run)
-            print(f'missed run {run} of {fname}.')
+            print(f'missed run {run} of {fname} as no file exists.')
+            continue
+        except IndexError:
+            missed_runs.append(run)
+            print(f'missed run {run} of {fname} as data block is incomplete.')
             continue
 
         try:
@@ -92,7 +96,7 @@ def process_logs(basename,eof,runslist,
             dat = ll.data[0]
         except IndexError:
             missed_runs.append(run)
-            print(f'missed run {run} of {fname}.')
+            print(f'missed run {run} of {fname} as no data is present.')
             continue
 
 

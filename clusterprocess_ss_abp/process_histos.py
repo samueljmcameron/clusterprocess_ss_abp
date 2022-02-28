@@ -98,7 +98,7 @@ def process_histos(basename,eof,pos_bins,cutoff,runslist,nskip=None,
             basename = tmpname.replace('HERE',runstarts[run_index])
 
         fname = basename + f'{run}'+eof
-
+        print(fname)
         try:
             hl = HistogramLoader(fname)
         except FileNotFoundError:

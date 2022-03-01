@@ -19,7 +19,7 @@ def autocorrelation(xs):
 
 def process_logs(basename,eof,runslist,
                  outputs = ['c_pairpress','c_pfd'],runstarts=None,
-                 t_start=-1):
+                 t_start=-1,autoCorrs=[]):
 
     """
     
@@ -50,6 +50,11 @@ def process_logs(basename,eof,runslist,
         A single start time for all the different runs. Necessary if
         the runs all start at different times to average correctly
         (assuming same end time and time spacing). Default is -1.
+    autoCorrs : list of strings (optional) or None
+        Names of the computes that are in the thermo output which
+        should calculate autocorrelations. To avoid computing any
+        autocorrelations, set this to None.
+        Default is a copy of the outputs list.
 
     Returns
     -------
@@ -66,6 +71,11 @@ def process_logs(basename,eof,runslist,
 
     # list of missed runs
     missed_runs = []
+
+    if not autoCorrs:
+        autoCorrs = outputs.copy()
+    elif autoCorrs is None:
+        autoCorrs = []
 
     # time periods of measurement (same for each of the nrun runs)
     #  i.e. if there is a pre-quench and a post-quench chunk of
@@ -133,16 +143,16 @@ def process_logs(basename,eof,runslist,
                 #   thermo data at each run
                 for key in outputs:
                     histlist[timeperiod][key] = np.empty([nruns,ntime],float)
-                    if autoCorr:
-                        histlist[timeperiod][key + "_autocorr"] = np.empty([nruns,ntime],float)
+                for key in autoCorrs:
+                    histlist[timeperiod][key + "_autocorr"] = np.empty([nruns,ntime],float)
 
                 
             # save data in current entry of histlist
             for key in outputs:
                 histlist[timeperiod][key][count,:] = data_t[key][mask]
-                if autoCorr:
-                    histlist[timeperiod][key + "_autocorr"][count,:]
-                    = autocorrelation(data_t[key][mask])
+            for key in autoCorrs:
+                histlist[timeperiod][key + "_autocorr"][count,:]
+                = autocorrelation(data_t[key][mask])
         count += 1
 
 
@@ -161,6 +171,7 @@ def process_logs(basename,eof,runslist,
         for key,value in histlist[timeperiod].items():
             estimators[timeperiod][key] = np.mean(value[:count,:],axis=0)
             estimators[timeperiod][key+'_std'] = np.std(value[:count,:],axis=0)
+
 
     # store final values of 
     finaldict = {'estimators' : estimators,

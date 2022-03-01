@@ -4,7 +4,18 @@ import sys
 
 from lammpstools import LogLoader
 
+def autocorrelation(xs):
 
+    xp = np.fft.ifftshift(xs)#(xs-np.average(xs))/np.sqrt(np.var(xs)))
+    n, = xp.shape
+
+    xp = np.r_[xp[:n//2],np.zeros_like(xp),xp[n//2:]]
+    
+    f = np.fft.fft(xp)
+
+    iff = np.fft.ifft(np.abs(f)**2)
+
+    return iff.real[:n]/(np.arange(n)[::-1]+1)#iff.real[:n//2]/(np.arange(n//2)[::-1]+n//2)
 
 def process_logs(basename,eof,runslist,
                  outputs = ['c_pairpress','c_pfd'],runstarts=None,
@@ -122,11 +133,16 @@ def process_logs(basename,eof,runslist,
                 #   thermo data at each run
                 for key in outputs:
                     histlist[timeperiod][key] = np.empty([nruns,ntime],float)
+                    if autoCorr:
+                        histlist[timeperiod][key + "_autocorr"] = np.empty([nruns,ntime],float)
 
+                
             # save data in current entry of histlist
             for key in outputs:
                 histlist[timeperiod][key][count,:] = data_t[key][mask]
-
+                if autoCorr:
+                    histlist[timeperiod][key + "_autocorr"][count,:]
+                    = autocorrelation(data_t[key][mask])
         count += 1
 
 

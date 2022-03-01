@@ -151,8 +151,7 @@ def process_logs(basename,eof,runslist,
             for key in outputs:
                 histlist[timeperiod][key][count,:] = data_t[key][mask]
             for key in autoCorrs:
-                histlist[timeperiod][key + "_autocorr"][count,:]
-                = autocorrelation(data_t[key][mask])
+                histlist[timeperiod][key + "_autocorr"][count,:] = autocorrelation(data_t[key][mask])
         count += 1
 
 

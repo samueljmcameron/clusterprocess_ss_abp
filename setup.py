@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="clusterprocess_ss_abp",
-    version="0.0.3",
+    version="0.0.4",
     author="Sam Cameron",
     author_email="samuel.j.m.cameron@gmail.com",
     description="package to process LAMMPS data",

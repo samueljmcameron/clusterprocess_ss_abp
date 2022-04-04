@@ -7,7 +7,7 @@ from lammpstools import HistogramLoader, CondensedArray_oTwo, CondensedArray_oTh
 
 def process_histos(basename,eof,pos_bins,cutoff,runslist,nskip=None,
                    theta_bins=None,dtype='rdf',varname='c_myhistos',
-                   runstarts=None,t_start=-1):
+                   histdict=None,runstarts=None,t_start=-1):
 
     """
     
@@ -43,6 +43,10 @@ def process_histos(basename,eof,pos_bins,cutoff,runslist,nskip=None,
     varname : string (optional)
         prefix name of header in # row output of data. Default
         is 'c_myhistos'.
+    histdict : dict (optional)
+        Dictionary labeling columns in the rdf input files and assigning
+        them a number in the output files. Default is None, which then
+        chooses an appropriate histdict dependent on data type.
     runstarts : 1D list of strings (optional)
         Strings to insert in basename for each different run.
         Length of list should be same as runslist length above.
@@ -66,18 +70,21 @@ def process_histos(basename,eof,pos_bins,cutoff,runslist,nskip=None,
     """
 
     if dtype == 'rdf':
-        histdict = {'g' : 2, 'U_1' : 3, 'C_1' : 4, 'U_2' : 5,
-                    'C_2' : 6, 'UC' : 7, 'D_2' : 8, 'ncoord' : 9}
+        if histdict == None:
+            histdict = {'g' : 2, 'U_1' : 3, 'C_1' : 4, 'U_2' : 5,
+                        'C_2' : 6, 'UC' : 7, 'D_2' : 8, 'ncoord' : 9}
     elif dtype == '3bod':
         if nskip == None:
             raise ValueError("need nskip argument for dtype='3bod'.")
-        histdict={'g3' : 3 , 'g3cos' : 4}
+        if histdict == None:
+            histdict={'g3' : 3 , 'g3cos' : 4}
     elif dtype == '3bodfull':
         if nskip == None:
             raise ValueError("need nskip argument for dtype='3bodfull'.")
         if theta_bins == None:
             raise ValueError("need theta_bins argument for dtype='3bodfull' dtype.")
-        histdict={'g3' : 4 }
+        if histdict == None:
+            histdict={'g3' : 4 }
 
     missed_runs = []
     # store the times of measurement (same for each of the nrun runs)
